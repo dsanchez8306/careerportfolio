@@ -1,0 +1,121 @@
+---
+title: "DAE2"
+author: "Dominic Sanchez"
+date: "2026-04-06"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Read Displacement Test Data
+
+```{r}
+oil <- read.csv("CRUDEOIL.csv")
+head(oil)
+```
+
+
+## Question 1: Histogram of Oil Recovery
+
+```{r}
+hist(oil$OILREC,
+     main = "Histogram of Oil Recovery",
+     breaks = 3,
+     xlab = "Oil Recovery",
+     ylab = "Frequency")
+```
+
+
+## Question 2: Scatterplot of Oil Recovery vs Dipping Angle
+
+```{r}
+plot(oil$DIPANGLE, oil$OILREC,
+     main = "Scatterplot of Oil Recovery vs Dipping Angle",
+     xlab = "Dipping Angle",
+     ylab = "Oil Recovery")
+```
+
+Scatterplot shows a roughly linear trend.
+
+## Question 3: Scatterplot of Oil Recovery vs Pressure
+
+```{r}
+plot(oil$PRESSURE, oil$OILREC,
+     main = "Scatterplot of Pressure vs Oil Recovery",
+     xlab = "Pressure",
+     ylab = "Oil Recovery")
+```
+
+Scatterplot shows a moderately weak linear trend
+
+## Question 4: Center the Independent Variables
+
+```{r}
+oil$angle.cen <- oil$DIPANGLE - mean(oil$DIPANGLE)
+oil$pressure.cen <- oil$PRESSURE - mean(oil$PRESSURE)
+
+head(oil)
+```
+
+
+## Question 5-12: Second-order model relating oil recovery to centered pressure and dipping angle
+
+```{r}
+oilreg.complete <- lm(OILREC ~ (angle.cen + pressure.cen)^2 + I(angle.cen^2) + I(pressure.cen^2), data = oil)
+summary(oilreg.complete)
+```
+
+Collecting the sample size to calculate the degrees of freedom
+
+```{r}
+n <- nrow(oil)
+n
+```
+
+## Question 13: Updated Regression Model
+
+Removing the first variable (interaction term)
+
+```{r}
+oilreg.complete2 <- lm(OILREC ~ angle.cen + pressure.cen + I(angle.cen^2) + I(pressure.cen^2), data = oil)
+summary(oilreg.complete2)
+```
+
+Second order effect of dip angle is still not significant, remove that next
+
+```{r}
+oilreg.complete3 <- lm(OILREC ~ angle.cen + pressure.cen + I(pressure.cen^2), data = oil)
+summary(oilreg.complete3)
+```
+
+All of the coefficients are statistically significant, so the model is complete.
+
+
+## Question 14: Residual plot
+
+```{r}
+plot(oilreg.complete3$fitted.values,
+     oilreg.complete3$residuals,
+     main = "Residuals vs Fitted Values",
+     xlab = "Predicted Astringency",
+     ylab = "Residuals")
+
+abline(0,0)
+```
+
+**The residual plot shows no clear pattern and roughly constant spread, so this assumption is reasonable.**
+
+
+## Question 15: Normal Quantile Plot
+
+```{r}
+qqnorm(oilreg.complete3$residuals)
+qqline(oilreg.complete3$residuals)
+```
+
+**Ignoring the tail end points, the residuals mostly follow the line, so this assumption is reasonable.**
+
+
+
