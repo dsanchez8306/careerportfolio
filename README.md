@@ -1,6 +1,6 @@
 # Portfolio
 
-Personal portfolio website: https://dsanchez8306.github.io/careerportfolio/
+Personal portfolio website: https://dsanchez8306.github.io/portfolio/
 
 ## What I changed
 
